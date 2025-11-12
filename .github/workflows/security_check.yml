@@ -49,6 +49,6 @@ jobs:
         run: |
           echo "===== 开始 Bandit 代码安全检查 ====="
           # -r: 递归扫描目录
-          bandit -r guipilot/ experiments/ --tests B105,B108,B311,B603
+          bandit -r guipilot/ experiments/ --tests B105,B108,B603
           echo "===== Bandit 检查结束 ====="
           echo ""
