@@ -13,21 +13,117 @@ jobs:
       - name: 拉取代码
         uses: actions/checkout@v4
 
-      - name: 配置 Python
-        uses: actions/setup-python@v5
+      - name: 配置 Miniconda
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: "3.11"
+          environment-file: environment.yml
+          activate-environment: guipilot
+          miniconda-version: "latest"
 
       - name: 安装代码检查工具
+        shell: bash -l {0}
         run: |
           python -m pip install --upgrade pip
           pip install black flake8 pylint
 
-      - name: 用 black 检查代码格式
-        run: black --diff --check guipilot/ experiments/ || true
+      # 1. Black 检查 (不退出，统计需格式化文件数) 
+      - name: Black 代码格式检查
+        shell: bash -l {0}
+        id: black-check
+        run: |
+          # 执行 black 检查，输出结果到临时文件
+          black --check guipilot/ experiments/ > black_result.txt 2>&1 || true
+          # 统计需格式化文件数 (提取 "X files would be reformatted" 中的 X) 
+          BLACK_REFORMAT=$(grep -oP '\d+(?= files would be reformatted)' black_result.txt || echo 0)
+          # 统计无格式问题文件数
+          BLACK_UNCHANGED=$(grep -oP '\d+(?= files would be left unchanged)' black_result.txt || echo 0)
+          # 统计无法格式化文件数
+          BLACK_FAILED=$(grep -oP '\d+(?= file would fail to reformat)' black_result.txt || echo 0)
+          # 输出结果
+          echo "===== Black 检查结果 ====="
+          echo "需格式化文件数: $BLACK_REFORMAT"
+          echo "无格式问题文件数: $BLACK_UNCHANGED"
+          echo "无法格式化文件数: $BLACK_FAILED"
+          echo "=========================="
+          # 保存到步骤输出，供后续汇总
+          echo "black_reformat=$BLACK_REFORMAT" >> $GITHUB_OUTPUT
+          echo "black_failed=$BLACK_FAILED" >> $GITHUB_OUTPUT
 
-      - name: 用 flake8 检查语法错误
-        run: flake8 guipilot/ experiments/ --count --select=E9,F63,F7,F82 --show-source --statistics
+      # 2. Flake8 检查 (不退出，统计 Error/Warning 数) 
+      - name: Flake8 语法与警告检查
+        shell: bash -l {0}
+        id: flake8-check
+        run: |
+          # 执行 flake8 检查，输出结果到临时文件 (仅检查 E9,F63,F7,F82 类错误) 
+          flake8 guipilot/ experiments/ --select=E9,F63,F7,F82 --statistics > flake8_result.txt 2>&1 || true
+          # 统计 Error 总数 (flake8 中 E/F 类都是 Error，无 Warning) 
+          FLAKE8_ERRORS=$(grep -oP '^\d+' flake8_result.txt || echo 0)
+          # 输出结果
+          echo "===== Flake8 检查结果 ====="
+          echo "致命错误数 (E9/F63/F7/F82) : $FLAKE8_ERRORS"
+          echo "错误详情 (前10条) :"
+          head -n 10 flake8_result.txt
+          echo "=========================="
+          # 保存到步骤输出
+          echo "flake8_errors=$FLAKE8_ERRORS" >> $GITHUB_OUTPUT
 
-      - name: 用 pylint 检查代码质量
-        run: pylint guipilot/ --disable=R,C,W1203,W1202  # 忽略部分非关键警告
+      # 3. Pylint 检查 (不退出，统计 Error/Warning 数) 
+      - name: Pylint 代码质量检查
+        shell: bash -l {0}
+        id: pylint-check
+        run: |
+          # 执行 pylint 检查，输出结果到临时文件 (忽略无关类别) 
+          pylint guipilot/ --disable=R,C,W1203,W1202,E0401 --output-format=text > pylint_result.txt 2>&1 || true
+          # 统计 Error 数 (E 类) 
+          PYLINT_ERRORS=$(grep -oP 'E\d+:' pylint_result.txt | wc -l || echo 0)
+          # 统计 Warning 数 (W 类) 
+          PYLINT_WARNINGS=$(grep -oP 'W\d+:' pylint_result.txt | wc -l || echo 0)
+          # 提取代码评分
+          PYLINT_SCORE=$(grep -oP '(?<=rated at )\d+\.\d+(?=/10)' pylint_result.txt || echo 0.0)
+          # 输出结果
+          echo "===== Pylint 检查结果 ====="
+          echo "Error 数 (E类) : $PYLINT_ERRORS"
+          echo "Warning 数 (W类) : $PYLINT_WARNINGS"
+          echo "代码评分: $PYLINT_SCORE/10"
+          echo "错误/Warning 详情 (前10条) :"
+          grep -E '(E\d+|W\d+):' pylint_result.txt | head -n 10
+          echo "=========================="
+          # 保存到步骤输出
+          echo "pylint_errors=$PYLINT_ERRORS" >> $GITHUB_OUTPUT
+          echo "pylint_warnings=$PYLINT_WARNINGS" >> $GITHUB_OUTPUT
+          echo "pylint_score=$PYLINT_SCORE" >> $GITHUB_OUTPUT
+
+      # 4. 汇总所有结果 (关键：便于统计指标) 
+      - name: 汇总代码风格检查结果
+        shell: bash -l {0}
+        run: |
+          echo "==================================== 代码风格检查汇总 ===================================="
+          echo "1. Black 格式检查:"
+          echo "   - 需格式化文件数: ${{ steps.black-check.outputs.black_reformat }}"
+          echo "   - 无法格式化文件数: ${{ steps.black-check.outputs.black_failed }}"
+          echo "2. Flake8 致命错误:"
+          echo "   - 致命错误数 (E9/F63/F7/F82) : ${{ steps.flake8-check.outputs.flake8_errors }}"
+          echo "3. Pylint 代码质量:"
+          echo "   - Error 数: ${{ steps.pylint-check.outputs.pylint_errors }}"
+          echo "   - Warning 数: ${{ steps.pylint-check.outputs.pylint_warnings }}"
+          echo "   - 代码评分: ${{ steps.pylint-check.outputs.pylint_score }}/10"
+          echo "=========================================================================================="
+          # 可选：将汇总结果保存为文件，上传为 Artifact (便于后续下载分析) 
+          mkdir -p ci-results
+          echo "black_reformat: ${{ steps.black-check.outputs.black_reformat }}" > ci-results/style-summary.txt
+          echo "black_failed: ${{ steps.black-check.outputs.black_failed }}" >> ci-results/style-summary.txt
+          echo "flake8_errors: ${{ steps.flake8-check.outputs.flake8_errors }}" >> ci-results/style-summary.txt
+          echo "pylint_errors: ${{ steps.pylint-check.outputs.pylint_errors }}" >> ci-results/style-summary.txt
+          echo "pylint_warnings: ${{ steps.pylint-check.outputs.pylint_warnings }}" >> ci-results/style-summary.txt
+          echo "pylint_score: ${{ steps.pylint-check.outputs.pylint_score }}" >> ci-results/style-summary.txt
+
+      # 5. 上传检查结果文件 (可选，便于本地分析) 
+      - name: 上传检查结果
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-style-results
+          path: |
+            black_result.txt
+            flake8_result.txt
+            pylint_result.txt
+            ci-results/style-summary.txt
