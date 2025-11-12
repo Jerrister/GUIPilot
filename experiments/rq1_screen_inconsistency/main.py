@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
                     print(
                         f"{mutation_name} |",
-                        f"{image_path.split('/')[-2]}/{image_path.split('/')[-1]} |",
+                        f"{image_path.split("/")[-2]}/{image_path.split("/")[-1]} |",
                         "{:<10}".format(matcher_name),
                         "{:<10}".format(checker_name),
                         "|",
