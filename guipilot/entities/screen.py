@@ -1,18 +1,21 @@
 from __future__ import annotations
+
 import typing
 from dataclasses import dataclass, field
 
 import cv2
 import numpy as np
 
-from .constants import Bbox
-from .widget import Widget, WidgetType
 from guipilot.models import OCR, Detector
 
+from .constants import Bbox
+from .widget import Widget, WidgetType
+
 if typing.TYPE_CHECKING:
-    from .screen import Screen
     from guipilot.checker import ScreenChecker
     from guipilot.matcher import WidgetMatcher
+
+    from .screen import Screen
 
 
 ocr = OCR(service_url="http://localhost:5000/detect")

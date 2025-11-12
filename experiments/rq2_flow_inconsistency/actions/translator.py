@@ -4,8 +4,9 @@ from typing import Literal
 import uiautomator2 as u2
 from uiautomator2 import Device, UiObject
 
+from guipilot.entities import Bbox, Screen
+
 from .automator import Automator
-from guipilot.entities import Screen, Bbox
 
 
 class Translator(Automator):

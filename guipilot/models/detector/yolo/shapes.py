@@ -4,7 +4,7 @@ try:
     import networkx as nx
 except:
     pass
-from fitz import Rect, Point
+from fitz import Point, Rect
 
 __all__ = ["rect", "point", "line", "line_seq"]
 

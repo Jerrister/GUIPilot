@@ -1,40 +1,24 @@
-import os
 import csv
 import glob
-import warnings
+import os
 import random
+import warnings
 from copy import deepcopy
 from typing import Callable
 
 from dotenv import load_dotenv
+from mutate import (change_widgets_color, change_widgets_text, delete_row,
+                    insert_row, swap_widgets)
+from utils import (convert_inconsistencies, filter_color,
+                   filter_overlap_predictions, filter_swapped_predictions,
+                   filter_text, load_screen, visualize_inconsistencies)
 
-from guipilot.matcher import (
-    WidgetMatcher,
-    GUIPilotV2 as GUIPilotMatcher,
-    GVT as GVTMatcher,
-)
-
-from guipilot.checker import ScreenChecker, GVT as GVTChecker
-
+from guipilot.checker import GVT as GVTChecker
+from guipilot.checker import ScreenChecker
 from guipilot.entities import Screen
-
-from mutate import (
-    insert_row,
-    delete_row,
-    swap_widgets,
-    change_widgets_text,
-    change_widgets_color,
-)
-
-from utils import (
-    load_screen,
-    visualize_inconsistencies,
-    convert_inconsistencies,
-    filter_swapped_predictions,
-    filter_overlap_predictions,
-    filter_color,
-    filter_text,
-)
+from guipilot.matcher import GVT as GVTMatcher
+from guipilot.matcher import GUIPilotV2 as GUIPilotMatcher
+from guipilot.matcher import WidgetMatcher
 
 
 def metrics(y_pred: set, y_true: set) -> tuple[int, int, int, int]:

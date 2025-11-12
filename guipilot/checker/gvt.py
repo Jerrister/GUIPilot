@@ -1,15 +1,17 @@
 from __future__ import annotations
-import typing
-import re
+
 import math
+import re
+import typing
 from difflib import SequenceMatcher
 
 import cv2
 import numpy as np
 from PIL import Image
 
+from guipilot.entities import Inconsistency, WidgetType
+
 from .checker import ScreenChecker
-from guipilot.entities import WidgetType, Inconsistency
 
 if typing.TYPE_CHECKING:
     from guipilot.entities import Widget

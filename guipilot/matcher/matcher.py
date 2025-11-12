@@ -1,12 +1,13 @@
 from __future__ import annotations
+
 import typing
-from typing import TypeAlias
 from abc import ABC, abstractmethod
+from typing import TypeAlias
 
 from guipilot.entities import Bbox
 
 if typing.TYPE_CHECKING:
-    from guipilot.entities import Widget, Screen
+    from guipilot.entities import Screen, Widget
 
 
 Pair: TypeAlias = tuple[int, int]

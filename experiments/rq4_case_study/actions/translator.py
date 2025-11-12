@@ -1,6 +1,6 @@
 from typing import Literal
 
-from guipilot.entities import Screen, Bbox
+from guipilot.entities import Bbox, Screen
 
 
 class Translator:

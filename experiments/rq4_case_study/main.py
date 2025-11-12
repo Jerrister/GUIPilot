@@ -1,21 +1,15 @@
-import os
 import json
+import os
 
 import cv2
 from dotenv import load_dotenv
+from utils import (check_action, get_action_completion, get_report, get_scores,
+                   get_screen, visualize)
 
 from guipilot.agent import GPTAgent
-from guipilot.matcher import GUIPilotV2 as GUIPilotMatcher
 from guipilot.checker import GVT as GVTChecker
 from guipilot.entities import Screen
-from utils import (
-    get_screen,
-    get_scores,
-    get_report,
-    get_action_completion,
-    visualize,
-    check_action,
-)
+from guipilot.matcher import GUIPilotV2 as GUIPilotMatcher
 
 
 def get_processes(mockups_path: str) -> list[str]:

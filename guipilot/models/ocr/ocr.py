@@ -1,8 +1,8 @@
 import base64
 
 import cv2
-import requests
 import numpy as np
+import requests
 from paddleocr import PaddleOCR
 
 

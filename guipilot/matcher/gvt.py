@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 import typing
 from timeit import default_timer as timer
 
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-from guipilot.matcher import WidgetMatcher, Pair, Score
+from guipilot.matcher import Pair, Score, WidgetMatcher
 
 if typing.TYPE_CHECKING:
     from guipilot.entities import Screen

@@ -1,10 +1,10 @@
-import os
 import base64
+import os
 
 import cv2
-import torch
-import requests
 import numpy as np
+import requests
+import torch
 from ultralytics import YOLO
 from ultralytics.engine.results import Results
 

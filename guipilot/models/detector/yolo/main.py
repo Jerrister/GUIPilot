@@ -1,16 +1,16 @@
-import os, shutil
-from PIL import Image
-import json
-import yaml
-from .shapes import Widget
 import argparse
-from ultralytics import YOLO
+import json
+import os
+import shutil
+
+import numpy as np
+import yaml
+from PIL import Image
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
-import numpy as np
-import os, shutil
-from PIL import Image
-import json
+from ultralytics import YOLO
+
+from .shapes import Widget
 
 
 def create_coco_json(annotation_list, label2id, output_json_path, coco_format):

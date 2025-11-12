@@ -1,17 +1,17 @@
-import os
-import glob
-import json
 import copy
+import glob
 import inspect
-from typing import Literal, Callable, Optional
-from typing_extensions import Self
+import json
+import os
 from timeit import default_timer as timer
+from typing import Callable, Literal, Optional
 
 import uiautomator2 as u2
-from uiautomator2 import Device, UiObject
 from pydantic import BaseModel, model_validator
+from typing_extensions import Self
+from uiautomator2 import Device, UiObject
 
-from .automator import Automator, Action
+from .automator import Action, Automator
 
 
 class Step(BaseModel):

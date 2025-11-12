@@ -1,23 +1,22 @@
+import copy
+import json
 import os
 import re
-import json
-import copy
 from functools import partial
-from typing import Iterable
 from timeit import default_timer as timer
+from typing import Iterable
 
 import cv2
 import jsbeautifier
 import numpy as np
 import supervision as sv
+from actions import Translator
 from PIL import Image
 from supervision import Detections
 
-from actions import Translator
 from guipilot.agent import Agent
 from guipilot.entities import Screen
 from guipilot.matcher import WidgetMatcher
-from guipilot.entities import Screen
 
 
 def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):

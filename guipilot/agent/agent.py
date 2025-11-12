@@ -1,6 +1,6 @@
+import base64
 import io
 import os
-import base64
 from abc import ABC, abstractmethod
 from typing import Optional
 

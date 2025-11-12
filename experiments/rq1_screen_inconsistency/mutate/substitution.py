@@ -1,15 +1,16 @@
-import string
 import random
-from copy import deepcopy
+import string
 from collections import Counter
+from copy import deepcopy
 
+import albumentations as A
 import cv2
 import numpy as np
-import albumentations as A
 from scipy.optimize import linear_sum_assignment
 
-from guipilot.entities import Bbox, Inconsistency, WidgetType, Widget, Screen
-from .utils import sample_p, get_context_color
+from guipilot.entities import Bbox, Inconsistency, Screen, Widget, WidgetType
+
+from .utils import get_context_color, sample_p
 
 
 def swap_widgets(screen: Screen, p: float) -> tuple[Screen, set]:

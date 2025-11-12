@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import typing
 from abc import ABC, abstractmethod
 from timeit import default_timer as timer
@@ -6,7 +7,7 @@ from timeit import default_timer as timer
 import numpy as np
 
 if typing.TYPE_CHECKING:
-    from guipilot.entities import Widget, Screen
+    from guipilot.entities import Screen, Widget
 
 
 class ScreenChecker(ABC):

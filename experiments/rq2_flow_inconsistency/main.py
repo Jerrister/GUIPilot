@@ -1,28 +1,21 @@
-import os
-import time
 import glob
+import os
 import random
+import time
 import warnings
-from timeit import default_timer as timer
 from copy import deepcopy
+from timeit import default_timer as timer
 
 import cv2
-from dotenv import load_dotenv
-
 from actions import Automator, Record
-from utils import (
-    get_mock_screen,
-    get_real_screen,
-    get_scores,
-    get_action_completion,
-    execute_action,
-    check_overlap,
-)
+from dotenv import load_dotenv
+from utils import (check_overlap, execute_action, get_action_completion,
+                   get_mock_screen, get_real_screen, get_scores)
+
 from guipilot.agent import GPTAgent
+from guipilot.checker import GVT as GVTChecker
 from guipilot.entities import Screen
 from guipilot.matcher import GUIPilotV2 as GUIPilotMatcher
-from guipilot.checker import GVT as GVTChecker
-
 
 if __name__ == "__main__":
     load_dotenv()

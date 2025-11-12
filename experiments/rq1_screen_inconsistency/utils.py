@@ -1,13 +1,13 @@
-import os
-import json
 import copy
+import json
+import os
 
 import cv2
 import numpy as np
 import supervision as sv
 from supervision import Detections
 
-from guipilot.entities import Bbox, WidgetType, Widget, Screen, Inconsistency
+from guipilot.entities import Bbox, Inconsistency, Screen, Widget, WidgetType
 
 
 def visualize_inconsistencies(

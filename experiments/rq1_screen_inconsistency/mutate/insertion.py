@@ -1,15 +1,15 @@
-import os
 import glob
+import os
 import random
 from copy import deepcopy
 
 import numpy as np
 from dotenv import load_dotenv
-
-from guipilot.entities import Screen, Widget, Inconsistency, Bbox
 from utils import load_screen
-from .utils import sample_p
 
+from guipilot.entities import Bbox, Inconsistency, Screen, Widget
+
+from .utils import sample_p
 
 load_dotenv()
 DATASET_PATH = os.getenv("DATASET_PATH")

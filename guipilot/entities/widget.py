@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 import typing
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
 
 if typing.TYPE_CHECKING:
     from .constants import Bbox

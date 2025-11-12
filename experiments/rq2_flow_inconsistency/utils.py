@@ -2,20 +2,20 @@ import os
 import re
 from copy import deepcopy
 from functools import partial
-from typing import Callable, Iterable
 from timeit import default_timer as timer
+from typing import Callable, Iterable
 
 import cv2
 import numpy as np
 import supervision as sv
+from actions import Automator, Step, Translator
 from PIL import Image
 from supervision import Detections
 
-from actions import Step, Automator, Translator
 from guipilot.agent import Agent
+from guipilot.checker import ScreenChecker
 from guipilot.entities import Screen
 from guipilot.matcher import WidgetMatcher
-from guipilot.checker import ScreenChecker
 
 
 def get_mock_screen(process_path: str, step: Step) -> Screen:

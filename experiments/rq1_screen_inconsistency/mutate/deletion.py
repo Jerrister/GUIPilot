@@ -2,8 +2,9 @@ from copy import deepcopy
 
 import numpy as np
 
-from guipilot.entities import Screen, Widget, Inconsistency, Bbox
-from .utils import sample_p, get_context_color
+from guipilot.entities import Bbox, Inconsistency, Screen, Widget
+
+from .utils import get_context_color, sample_p
 
 
 def delete_widgets(screen: Screen, p: float) -> tuple[Screen, set]:

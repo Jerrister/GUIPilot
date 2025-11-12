@@ -1,11 +1,13 @@
 from __future__ import annotations
+
 import typing
 from timeit import default_timer as timer
 
 if typing.TYPE_CHECKING:
-    from .screen import Screen
     from guipilot.checker import ScreenChecker
     from guipilot.matcher import WidgetMatcher
+
+    from .screen import Screen
 
 
 class Process(object):
