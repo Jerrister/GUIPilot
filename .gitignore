@@ -9,6 +9,8 @@ __pycache__
 
 .env
 
+build
+
 experiments/rq1_screen_inconsistency/analysis
 experiments/rq1_screen_inconsistency/examples
 experiments/rq1_screen_inconsistency/visualize*
