@@ -8,7 +8,7 @@ __pycache__
 *.pt
 
 .env
-
+.ruff_cache
 build
 
 experiments/rq1_screen_inconsistency/analysis

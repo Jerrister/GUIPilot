@@ -115,7 +115,7 @@ def insert_widgets(screen: Screen, p: float) -> tuple[Screen, set]:
 
 
 def insert_row(screen: Screen, p: float) -> tuple[Screen, set]:
-    """
+    r"""
         0. Pick a random screen
         1. Select a random widget `a` to be inserted
         2. Find all other widgets `b` on the same row as `a`, then calculate the total row height
