@@ -61,7 +61,9 @@ def get_screen(process_path: str, filename: str) -> Screen:
     return screen
 
 
-def get_scores(mock: Screen, real: Screen, matcher: WidgetMatcher) -> tuple[list, float, float]:
+def get_scores(
+    mock: Screen, real: Screen, matcher: WidgetMatcher
+) -> tuple[list, float, float]:
     """Get consistency scores for the current (real) screen as compared to mock screen.
 
     Args:
@@ -132,7 +134,11 @@ def get_report(
         "pairs": [
             {
                 "ids": [id1, id2],
-                **({"inconsistencies": mapping[(id1, id2)]} if (id1, id2) in mapping else {}),
+                **(
+                    {"inconsistencies": mapping[(id1, id2)]}
+                    if (id1, id2) in mapping
+                    else {}
+                ),
             }
             for (id1, id2) in pairs
         ],
@@ -164,15 +170,23 @@ def visualize(
         current_x = 0  # keep track of where your current image was last placed in the y coordinate
         for image in img_list:
             # add an image to the final array and increment the y coordinate
-            image = np.vstack((image, np.zeros((max_height - image.shape[0], image.shape[1], 3))))
+            image = np.vstack(
+                (image, np.zeros((max_height - image.shape[0], image.shape[1], 3)))
+            )
             final_image[:, current_x : current_x + image.shape[1], :] = image
             current_x += image.shape[1]
         return final_image
 
     annotators = [
-        sv.BoxAnnotator(color=sv.Color.GREEN, thickness=2, color_lookup=sv.ColorLookup.INDEX),
-        sv.BoxAnnotator(color=sv.Color.YELLOW, thickness=2, color_lookup=sv.ColorLookup.INDEX),
-        sv.BoxAnnotator(color=sv.Color.RED, thickness=2, color_lookup=sv.ColorLookup.INDEX),
+        sv.BoxAnnotator(
+            color=sv.Color.GREEN, thickness=2, color_lookup=sv.ColorLookup.INDEX
+        ),
+        sv.BoxAnnotator(
+            color=sv.Color.YELLOW, thickness=2, color_lookup=sv.ColorLookup.INDEX
+        ),
+        sv.BoxAnnotator(
+            color=sv.Color.RED, thickness=2, color_lookup=sv.ColorLookup.INDEX
+        ),
     ]
     label_annotator = sv.LabelAnnotator(
         color=sv.Color.BLACK,
@@ -236,7 +250,9 @@ def visualize(
             continue
         detections = Detections(np.array(list(bboxes.values())))
         annotator.annotate(s1_image, detections)
-        label_annotator.annotate(s1_image, detections, labels=[f"{i}" for i in bboxes.keys()])
+        label_annotator.annotate(
+            s1_image, detections, labels=[f"{i}" for i in bboxes.keys()]
+        )
 
     s2_image = copy.deepcopy(s2.image)
     for (_, bboxes), annotator in zip(s2_bboxes.items(), annotators):
@@ -244,7 +260,9 @@ def visualize(
             continue
         detections = Detections(np.array(list(bboxes.values())))
         annotator.annotate(s2_image, detections)
-        label_annotator.annotate(s2_image, detections, labels=[f"{i}" for i in bboxes.keys()])
+        label_annotator.annotate(
+            s2_image, detections, labels=[f"{i}" for i in bboxes.keys()]
+        )
 
     image = _get_one_image([s1.image, s2.image])
     bbox_image = _get_one_image([s1_image, s2_image])
@@ -334,8 +352,12 @@ def annotate_screen(screen: Screen) -> Image.Image:
             text_x = x_min
             text_y = y_min + text_size[1]
 
-        cv2.putText(image, id, (text_x, text_y), font, font_scale, text_color, font_thickness)
-        cv2.rectangle(image, (x_min, y_min), (x_max, y_max), color=(0, 255, 0), thickness=2)
+        cv2.putText(
+            image, id, (text_x, text_y), font, font_scale, text_color, font_thickness
+        )
+        cv2.rectangle(
+            image, (x_min, y_min), (x_max, y_max), color=(0, 255, 0), thickness=2
+        )
 
     image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     return image
@@ -367,14 +389,21 @@ def check_action(true_action: dict, action_name: str, action) -> bool:
         x2_min, y2_min, x2_max, y2_max = box2
 
         # Check for overlap using the condition
-        return x1_min <= x2_max and x2_min <= x1_max and y1_min <= y2_max and y2_min <= y1_max
+        return (
+            x1_min <= x2_max
+            and x2_min <= x1_max
+            and y1_min <= y2_max
+            and y2_min <= y1_max
+        )
 
     if action_name != true_action["action"]:
         print("\t\t[x] Incorrect action name")
         return False
 
     bounds: list = action()
-    true_bounds: list = [true_action.get("bounds")] if true_action.get("bounds") is not None else []
+    true_bounds: list = (
+        [true_action.get("bounds")] if true_action.get("bounds") is not None else []
+    )
 
     if len(bounds) != len(true_bounds):
         print(bounds)

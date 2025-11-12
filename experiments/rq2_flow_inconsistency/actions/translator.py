@@ -50,7 +50,9 @@ class Translator(Automator):
         super().scroll(direction)
         return []
 
-    def swipe(self, id: int, direction: Literal["left", "right", "up", "down"]) -> list[Bbox]:
+    def swipe(
+        self, id: int, direction: Literal["left", "right", "up", "down"]
+    ) -> list[Bbox]:
         """Swipe from the center of the widget to its edge."""
 
         # Function to parse bounds from the hierarchy dump
@@ -68,7 +70,10 @@ class Translator(Automator):
                 bounds = node.attrib.get("bounds")
                 if bounds:
                     (left_top, right_bottom) = _parse_bounds(bounds)
-                    if left_top[0] <= x <= right_bottom[0] and left_top[1] <= y <= right_bottom[1]:
+                    if (
+                        left_top[0] <= x <= right_bottom[0]
+                        and left_top[1] <= y <= right_bottom[1]
+                    ):
                         return node
             return None
 

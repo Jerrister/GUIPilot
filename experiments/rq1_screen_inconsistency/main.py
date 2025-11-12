@@ -57,7 +57,9 @@ if __name__ == "__main__":
     all_paths: list[str] = []
     for app_path in glob.glob(os.path.join(dataset_path, "**", "*")):
         image_paths = glob.glob(f"{app_path}/*.jpg")
-        image_paths = [x for x in image_paths if x.split("/")[-1].replace(".jpg", "").isdigit()]
+        image_paths = [
+            x for x in image_paths if x.split("/")[-1].replace(".jpg", "").isdigit()
+        ]
         image_paths.sort(key=lambda path: int(path.split("/")[-1].replace(".jpg", "")))
         all_paths += image_paths
 
@@ -135,13 +137,17 @@ if __name__ == "__main__":
 
                         # Filter predictions for metrics
                         y_pred_raw = y_pred
-                        y_pred = postprocessing[mutation_name](y_pred, y_true, screen1, screen2)
+                        y_pred = postprocessing[mutation_name](
+                            y_pred, y_true, screen1, screen2
+                        )
 
                         # Visualize
                         _path = image_path.split("/")[-2]
                         _path = f"{matcher_name}_{checker_name}/{mutation_name}/{_path}"
                         _filename = image_path.split("/")[-1].replace(".jpg", "")
-                        visualize_inconsistencies(screen1, screen2, pairs, y_pred, _path, _filename)
+                        visualize_inconsistencies(
+                            screen1, screen2, pairs, y_pred, _path, _filename
+                        )
                         with open(f"./visualize/{_path}/{_filename}.txt", "w") as f:
                             f.writelines(
                                 [

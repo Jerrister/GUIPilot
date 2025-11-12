@@ -17,14 +17,24 @@ class GVT(WidgetMatcher):
         super().__init__()
         self.threshold = threshold
 
-    def match(self, screen_i: Screen, screen_j: Screen) -> tuple[list[Pair], list[Score], float]:
+    def match(
+        self, screen_i: Screen, screen_j: Screen
+    ) -> tuple[list[Pair], list[Score], float]:
         start_time = timer()
-        widget_keys_i, widget_keys_j = list(screen_i.widgets.keys()), list(screen_j.widgets.keys())
+        widget_keys_i, widget_keys_j = list(screen_i.widgets.keys()), list(
+            screen_j.widgets.keys()
+        )
         points_i = np.array(
-            [list(self._norm_xywh(screen_i, widget)) for widget in screen_i.widgets.values()]
+            [
+                list(self._norm_xywh(screen_i, widget))
+                for widget in screen_i.widgets.values()
+            ]
         )
         points_j = np.array(
-            [list(self._norm_xywh(screen_j, widget)) for widget in screen_j.widgets.values()]
+            [
+                list(self._norm_xywh(screen_j, widget))
+                for widget in screen_j.widgets.values()
+            ]
         )
 
         knn = NearestNeighbors(n_neighbors=1, metric="manhattan")

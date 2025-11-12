@@ -20,7 +20,9 @@ def create_coco_json(annotation_list, label2id, output_json_path, coco_format):
 
     # Continue indexing from the last id or start from 1
     image_id = max(image_dict.values(), default=0) + 1
-    annotation_id = max((ann["id"] for ann in coco_format["annotations"]), default=0) + 1
+    annotation_id = (
+        max((ann["id"] for ann in coco_format["annotations"]), default=0) + 1
+    )
 
     for annotation in annotation_list:
         image_name = annotation["image_name"]
@@ -52,7 +54,9 @@ def create_coco_json(annotation_list, label2id, output_json_path, coco_format):
         if annotation["category"] not in category_dict:
             category_id = label2id[annotation["category"]]
             category_dict[annotation["category"]] = category_id
-            coco_format["categories"].append({"id": category_id, "name": annotation["category"]})
+            coco_format["categories"].append(
+                {"id": category_id, "name": annotation["category"]}
+            )
 
         # Add annotation info
         coco_format["annotations"].append(
@@ -150,7 +154,9 @@ if __name__ == "__main__":
                 if file.endswith("json"):
                     json_file_path = os.path.join(ground_truth_dir, app_dir, file)
                     data = json.load(open(json_file_path, encoding="utf-8"))
-                    ws = [Widget.from_labelme(d, i) for i, d in enumerate(data["shapes"])]
+                    ws = [
+                        Widget.from_labelme(d, i) for i, d in enumerate(data["shapes"])
+                    ]
 
                     image_height = data["imageHeight"]
                     image_width = data["imageWidth"]
@@ -220,7 +226,9 @@ if __name__ == "__main__":
         coco_format = {
             "images": [],
             "annotations": [],
-            "categories": [{"id": label2id[label], "name": label} for label in label2id],
+            "categories": [
+                {"id": label2id[label], "name": label} for label in label2id
+            ],
         }
         create_coco_json(
             annotation_list=train_annotation_list,
@@ -232,7 +240,9 @@ if __name__ == "__main__":
         coco_format = {
             "images": [],
             "annotations": [],
-            "categories": [{"id": label2id[label], "name": label} for label in label2id],
+            "categories": [
+                {"id": label2id[label], "name": label} for label in label2id
+            ],
         }
         create_coco_json(
             annotation_list=test_annotation_list,
@@ -264,7 +274,11 @@ if __name__ == "__main__":
 
         for ct, app_dir in enumerate(sorted(os.listdir(ground_truth_dir))):
             for file in os.listdir(os.path.join(ground_truth_dir, app_dir)):
-                if file.endswith("png") or file.endswith("jpeg") or file.endswith("jpg"):
+                if (
+                    file.endswith("png")
+                    or file.endswith("jpeg")
+                    or file.endswith("jpg")
+                ):
                     image_name = os.path.join(ground_truth_dir, app_dir, file)
 
                     if image_name in image_dict:
@@ -295,12 +309,16 @@ if __name__ == "__main__":
                             predictions.append(prediction)
 
         # Write the prediction data to a JSON file
-        with open(f"./datasets/80app_test_predict_{args.model_name}.json", "w") as json_file:
+        with open(
+            f"./datasets/80app_test_predict_{args.model_name}.json", "w"
+        ) as json_file:
             json.dump(predictions, json_file)
 
         """Evaluate results"""
         cocoGt = COCO(args.json_test)  # Load the ground truth
-        cat_names = {cat["id"]: cat["name"] for cat in cocoGt.loadCats(cocoGt.getCatIds())}
+        cat_names = {
+            cat["id"]: cat["name"] for cat in cocoGt.loadCats(cocoGt.getCatIds())
+        }
         cocoDt = cocoGt.loadRes(
             f"./datasets/80app_test_predict_{args.model_name}.json"
         )  # Load your results

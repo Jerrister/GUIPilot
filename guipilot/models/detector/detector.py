@@ -25,7 +25,9 @@ class Detector:
         sorted_indices = np.lexsort((bboxes[:, 0], bboxes[:, 1]))
         sorted_bboxes = bboxes[sorted_indices]
         sorted_class_ids = class_ids[sorted_indices]
-        sorted_widget_types = [self.detector.names[int(class_id)] for class_id in sorted_class_ids]
+        sorted_widget_types = [
+            self.detector.names[int(class_id)] for class_id in sorted_class_ids
+        ]
         return sorted_bboxes, sorted_widget_types
 
     def __call__(self, image: np.ndarray):

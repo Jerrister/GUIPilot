@@ -83,9 +83,15 @@ def insert_widgets(screen: Screen, p: float) -> tuple[Screen, set]:
 
         image = random_screen.image[ymin1:ymax1, xmin1:xmax1].copy()
 
-        xmax3, ymax3 = min(xmin2 + image.shape[1], width), min(ymin2 + image.shape[0], height)
-        screen.image[ymin2:ymax3, xmin2:xmax3] = image[0 : ymax3 - ymin2, 0 : xmax3 - xmin2]
-        unoccupied_mask[ymin2 : ymin2 + image.shape[0], xmin2 : xmin2 + image.shape[1]] = 0
+        xmax3, ymax3 = min(xmin2 + image.shape[1], width), min(
+            ymin2 + image.shape[0], height
+        )
+        screen.image[ymin2:ymax3, xmin2:xmax3] = image[
+            0 : ymax3 - ymin2, 0 : xmax3 - xmin2
+        ]
+        unoccupied_mask[
+            ymin2 : ymin2 + image.shape[0], xmin2 : xmin2 + image.shape[1]
+        ] = 0
 
         new_widget_id = max(screen.widgets.keys()) + 1
         new_widget_ids.append(new_widget_id)
@@ -151,7 +157,10 @@ def insert_row(screen: Screen, p: float) -> tuple[Screen, set]:
                 continue
             _, ymin_b, xmax_b, ymax_b = widget_b.bbox
 
-            if not (ymax_b < ymin_a or ymin_b > ymax_a) and xmax_b <= screen.image.shape[1]:
+            if (
+                not (ymax_b < ymin_a or ymin_b > ymax_a)
+                and xmax_b <= screen.image.shape[1]
+            ):
                 selected.add(b)
                 ymin_row = min(ymin_row, ymin_b)
                 ymax_row = max(ymax_row, ymax_b)
@@ -175,9 +184,9 @@ def insert_row(screen: Screen, p: float) -> tuple[Screen, set]:
             dtype=np.uint8,
         )
         new_width = min(screen.image.shape[1], xmax_row)
-        new_rows[padding : padding + ymax_row - ymin_row, 0:new_width] = random_screen.image[
-            ymin_row:ymax_row, 0:new_width
-        ]
+        new_rows[padding : padding + ymax_row - ymin_row, 0:new_width] = (
+            random_screen.image[ymin_row:ymax_row, 0:new_width]
+        )
 
         # Select an unoccupied row as insertion point, more likely to insert to middle of screen
         mean, std = (len(unoccupied_rows) - 1) / 2, len(unoccupied_rows) / 6
@@ -193,7 +202,9 @@ def insert_row(screen: Screen, p: float) -> tuple[Screen, set]:
             xmin_c, ymin_c, xmax_c, ymax_c = widget_c.bbox
             if ymax_c >= y_insertion:
                 shifted.add(c)
-                widget_c.bbox = Bbox(xmin_c, ymin_c + y_offset, xmax_c, ymax_c + y_offset)
+                widget_c.bbox = Bbox(
+                    xmin_c, ymin_c + y_offset, xmax_c, ymax_c + y_offset
+                )
 
         # Add the new widgets to screen
         y_rel = min([random_screen.widgets[id].bbox.ymin for id in selected])
@@ -228,6 +239,7 @@ def insert_row(screen: Screen, p: float) -> tuple[Screen, set]:
     screen.widgets = dict(zip(sorted_widget_ids, sorted_widgets))
 
     changes = set(
-        [(None, id) for id in new_widget_ids] + [(id, id, Inconsistency.BBOX) for id in shifted]
+        [(None, id) for id in new_widget_ids]
+        + [(id, id, Inconsistency.BBOX) for id in shifted]
     )
     return screen, changes

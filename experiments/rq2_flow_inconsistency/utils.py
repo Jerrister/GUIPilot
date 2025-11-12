@@ -178,8 +178,12 @@ def annotate_screen(screen: Screen) -> Image.Image:
             text_x = rect_center_x - text_size[0] // 2
             text_y = rect_center_y + text_size[1] // 2
 
-        cv2.putText(image, id, (text_x, text_y), font, font_scale, text_color, font_thickness)
-        cv2.rectangle(image, (x_min, y_min), (x_max, y_max), color=(0, 255, 0), thickness=2)
+        cv2.putText(
+            image, id, (text_x, text_y), font, font_scale, text_color, font_thickness
+        )
+        cv2.rectangle(
+            image, (x_min, y_min), (x_max, y_max), color=(0, 255, 0), thickness=2
+        )
 
     image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     return image
@@ -202,15 +206,23 @@ def visualize_inconsistencies(
         current_x = 0  # keep track of where your current image was last placed in the y coordinate
         for image in img_list:
             # add an image to the final array and increment the y coordinate
-            image = np.vstack((image, np.zeros((max_height - image.shape[0], image.shape[1], 3))))
+            image = np.vstack(
+                (image, np.zeros((max_height - image.shape[0], image.shape[1], 3)))
+            )
             final_image[:, current_x : current_x + image.shape[1], :] = image
             current_x += image.shape[1]
         return final_image
 
     annotators = [
-        sv.BoxAnnotator(color=sv.Color.GREEN, thickness=2, color_lookup=sv.ColorLookup.INDEX),
-        sv.BoxAnnotator(color=sv.Color.YELLOW, thickness=2, color_lookup=sv.ColorLookup.INDEX),
-        sv.BoxAnnotator(color=sv.Color.RED, thickness=2, color_lookup=sv.ColorLookup.INDEX),
+        sv.BoxAnnotator(
+            color=sv.Color.GREEN, thickness=2, color_lookup=sv.ColorLookup.INDEX
+        ),
+        sv.BoxAnnotator(
+            color=sv.Color.YELLOW, thickness=2, color_lookup=sv.ColorLookup.INDEX
+        ),
+        sv.BoxAnnotator(
+            color=sv.Color.RED, thickness=2, color_lookup=sv.ColorLookup.INDEX
+        ),
     ]
     label_annotator = sv.LabelAnnotator(
         color=sv.Color.BLACK,
@@ -274,7 +286,9 @@ def visualize_inconsistencies(
             continue
         detections = Detections(np.array(list(bboxes.values())))
         annotator.annotate(s1_image, detections)
-        label_annotator.annotate(s1_image, detections, labels=[f"{i}" for i in bboxes.keys()])
+        label_annotator.annotate(
+            s1_image, detections, labels=[f"{i}" for i in bboxes.keys()]
+        )
 
     s2_image = s2.image
     for (name, bboxes), annotator in zip(s2_bboxes.items(), annotators):
@@ -282,7 +296,9 @@ def visualize_inconsistencies(
             continue
         detections = Detections(np.array(list(bboxes.values())))
         annotator.annotate(s2_image, detections)
-        label_annotator.annotate(s2_image, detections, labels=[f"{i}" for i in bboxes.keys()])
+        label_annotator.annotate(
+            s2_image, detections, labels=[f"{i}" for i in bboxes.keys()]
+        )
 
     image = _get_one_image([s1_image, s2_image])
     return image
@@ -294,4 +310,6 @@ def check_overlap(box1: Iterable[int], box2: Iterable[int]) -> bool:
     x2_min, y2_min, x2_max, y2_max = box2
 
     # Check for overlap using the condition
-    return x1_min <= x2_max and x2_min <= x1_max and y1_min <= y2_max and y2_min <= y1_max
+    return (
+        x1_min <= x2_max and x2_min <= x1_max and y1_min <= y2_max and y2_min <= y1_max
+    )

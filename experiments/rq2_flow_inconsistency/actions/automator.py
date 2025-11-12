@@ -76,7 +76,9 @@ class Automator:
         self.device.send_keys(text=text, clear=True)
         self.wait()
 
-    def scroll(self, direction: Literal["left", "right", "up", "down"], distance: int = 2):
+    def scroll(
+        self, direction: Literal["left", "right", "up", "down"], distance: int = 2
+    ):
         """Scroll until the end or the content is fully replaced with new content (i.e., 1 screen length)."""
         params = {
             "down": [0.5, 0.7, 0.5, 0.2],

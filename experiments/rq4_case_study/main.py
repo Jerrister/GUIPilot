@@ -54,13 +54,17 @@ for p, process_path in enumerate(process_paths):
         if "branch" in screen_filename:
             continue
         real_screen: Screen = get_screen(implementation_path, screen_filename)
-        mock_screen: Screen = get_screen(mockup_path, screen_filename.replace(".jpg", ".png"))
+        mock_screen: Screen = get_screen(
+            mockup_path, screen_filename.replace(".jpg", ".png")
+        )
         print(f"[>] Screen {p}-{s + 1}")
 
         # Match widgets and check for inconsistencies
         pairs, score, match_time = get_scores(mock_screen, real_screen, matcher)
         inconsistencies, check_time = checker.check(mock_screen, real_screen, pairs)
-        image, bbox_image, match_image = visualize(mock_screen, real_screen, pairs, inconsistencies)
+        image, bbox_image, match_image = visualize(
+            mock_screen, real_screen, pairs, inconsistencies
+        )
         print(f"\t[>] Score: {score}, {len(inconsistencies)} inconsistencies")
 
         # Use VLM agent to get actions that lead to next screen
@@ -82,7 +86,9 @@ for p, process_path in enumerate(process_paths):
 
             if not all(
                 check_action(true_action, action_name, action)
-                    for true_action, action_name, action in zip(true_actions, action_names, actions)
+                for true_action, action_name, action in zip(
+                    true_actions, action_names, actions
+                )
             ):
                 action_trials.append(actions_raw)
                 continue

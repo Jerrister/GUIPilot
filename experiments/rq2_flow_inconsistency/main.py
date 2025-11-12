@@ -63,7 +63,9 @@ if __name__ == "__main__":
 
         input("[MANUAL] Align phone screen, then continue.")
         for i, step in enumerate(record.steps[:-1]):
-            print(f"[STEP {i + 1}/{len(record.steps[:-1])}] {record.steps[i].description}")
+            print(
+                f"[STEP {i + 1}/{len(record.steps[:-1])}] {record.steps[i].description}"
+            )
 
             # Get the next mock screen
             mock_screen: Screen = get_mock_screen(process_path, record.steps[i + 1])
@@ -87,11 +89,15 @@ if __name__ == "__main__":
                 mock_screen = deepcopy(real_screen)
 
             # Check if real screen aligns with mock screen
-            visualize, scores, times = get_scores(mock_screen, real_screen, matcher, checker)
+            visualize, scores, times = get_scores(
+                mock_screen, real_screen, matcher, checker
+            )
             y_true = i != inconsistency_index
 
             # Save visualization
-            save_path = os.path.join(results_dir, f"{package_name}-{process_no}", f"{i}.jpg")
+            save_path = os.path.join(
+                results_dir, f"{package_name}-{process_no}", f"{i}.jpg"
+            )
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             cv2.imwrite(save_path, visualize)
 
@@ -140,9 +146,13 @@ if __name__ == "__main__":
 
                         # Save visualization
                         image, response = visualize
-                        save_path = os.path.join(results_dir, f"{package_name}-{process_no}")
+                        save_path = os.path.join(
+                            results_dir, f"{package_name}-{process_no}"
+                        )
                         os.makedirs(os.path.dirname(save_path), exist_ok=True)
-                        with open(os.path.join(save_path, f"{i}-inconsistent.txt"), "a") as f:
+                        with open(
+                            os.path.join(save_path, f"{i}-inconsistent.txt"), "a"
+                        ) as f:
                             f.write(response)
                         image.save(os.path.join(save_path, f"{i}-inconsistent.jpg"))
 

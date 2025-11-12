@@ -19,7 +19,9 @@ class Translator:
     def scroll(self, direction: Literal["left", "right", "up", "down"]):
         return []
 
-    def swipe(self, id: int, direction: Literal["left", "right", "up", "down"]) -> list[Bbox]:
+    def swipe(
+        self, id: int, direction: Literal["left", "right", "up", "down"]
+    ) -> list[Bbox]:
         return [self.widgets[id].bbox]
 
     def drag(self, id1: int, id2: int) -> list[Bbox]:

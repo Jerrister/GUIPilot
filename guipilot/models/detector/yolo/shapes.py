@@ -73,19 +73,25 @@ class Widget:
         return Widget(label, bounds)
 
     def to_yolo(self, label2id, image_width, image_height):
-        return Widget._to_yolo_label(self.label, self.bounds, label2id, image_width, image_height)
+        return Widget._to_yolo_label(
+            self.label, self.bounds, label2id, image_width, image_height
+        )
 
     @staticmethod
     def write_yolo_labels(file, label2id, widgets, image_width, image_height):
         lables = ""
         if isinstance(widgets, list):
             for widget in widgets:
-                lables = lables + widget.to_yolo(label2id, image_width, image_height) + "\n"
+                lables = (
+                    lables + widget.to_yolo(label2id, image_width, image_height) + "\n"
+                )
         elif isinstance(widgets, dict):
             for label, widget in zip(widgets["cls"], widgets["box"]):
                 lables = (
                     lables
-                    + Widget._to_yolo_label(label, widget, label2id, image_width, image_height)
+                    + Widget._to_yolo_label(
+                        label, widget, label2id, image_width, image_height
+                    )
                     + "\n"
                 )
         with open(file, "w") as f:
@@ -259,7 +265,9 @@ class rect(Rect):
         larger=False,
     ):
         f = rect if not isinstance(bbox1[0], rect) else lambda x: x
-        r = np.array([self.calc_combine_rate(f(b), larger, allow_overlap) for b in bbox1])
+        r = np.array(
+            [self.calc_combine_rate(f(b), larger, allow_overlap) for b in bbox1]
+        )
         if not sort:
             return r
         if max_only:
@@ -299,7 +307,10 @@ class rect(Rect):
 
     def inner(self, other: "rect"):
         return (
-            self.x0 > other.x0 and self.y0 > other.y0 and self.x1 < other.x1 and self.y1 < other.y1
+            self.x0 > other.x0
+            and self.y0 > other.y0
+            and self.x1 < other.x1
+            and self.y1 < other.y1
         )
 
     def relative_loc(self, other: "rect"):
@@ -335,7 +346,12 @@ class line:
                 raise ValueError("line: bad seq len")
             self.start = point(l[0], l[1])
             self.end = point(l[2], l[3])
-        if not directed and ordered and self.start.x >= self.end.x and self.start.y >= self.end.y:
+        if (
+            not directed
+            and ordered
+            and self.start.x >= self.end.x
+            and self.start.y >= self.end.y
+        ):
             a = self.start
             self.start = self.end
             self.end = a
@@ -464,7 +480,11 @@ class line:
         return np.where((np.abs(np.array(others) - np.array(self)) < d).all(axis=1))[0]
 
     def len_in_range(self, line_range):
-        if self.line_len < line_range[0] or len(line_range) > 1 and self.line_len > line_range[1]:
+        if (
+            self.line_len < line_range[0]
+            or len(line_range) > 1
+            and self.line_len > line_range[1]
+        ):
             return False
         return True
 
