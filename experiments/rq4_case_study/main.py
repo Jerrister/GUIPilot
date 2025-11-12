@@ -3,8 +3,14 @@ import os
 
 import cv2
 from dotenv import load_dotenv
-from utils import (check_action, get_action_completion, get_report, get_scores,
-                   get_screen, visualize)
+from utils import (
+    check_action,
+    get_action_completion,
+    get_report,
+    get_scores,
+    get_screen,
+    visualize,
+)
 
 from guipilot.agent import GPTAgent
 from guipilot.checker import GVT as GVTChecker
@@ -20,7 +26,7 @@ def get_processes(mockups_path: str) -> list[str]:
             full_path = os.path.abspath(root)
             parent_dirs.add(full_path)
 
-    return sorted(list(parent_dirs))
+    return sorted(parent_dirs)
 
 
 base_path = os.path.dirname(os.path.abspath(__file__))
@@ -48,17 +54,13 @@ for p, process_path in enumerate(process_paths):
         if "branch" in screen_filename:
             continue
         real_screen: Screen = get_screen(implementation_path, screen_filename)
-        mock_screen: Screen = get_screen(
-            mockup_path, screen_filename.replace(".jpg", ".png")
-        )
-        print(f"[>] Screen {p}-{s+1}")
+        mock_screen: Screen = get_screen(mockup_path, screen_filename.replace(".jpg", ".png"))
+        print(f"[>] Screen {p}-{s + 1}")
 
         # Match widgets and check for inconsistencies
         pairs, score, match_time = get_scores(mock_screen, real_screen, matcher)
         inconsistencies, check_time = checker.check(mock_screen, real_screen, pairs)
-        image, bbox_image, match_image = visualize(
-            mock_screen, real_screen, pairs, inconsistencies
-        )
+        image, bbox_image, match_image = visualize(mock_screen, real_screen, pairs, inconsistencies)
         print(f"\t[>] Score: {score}, {len(inconsistencies)} inconsistencies")
 
         # Use VLM agent to get actions that lead to next screen
@@ -79,12 +81,8 @@ for p, process_path in enumerate(process_paths):
                 continue
 
             if not all(
-                [
-                    check_action(true_action, action_name, action)
-                    for true_action, action_name, action in zip(
-                        true_actions, action_names, actions
-                    )
-                ]
+                check_action(true_action, action_name, action)
+                    for true_action, action_name, action in zip(true_actions, action_names, actions)
             ):
                 action_trials.append(actions_raw)
                 continue

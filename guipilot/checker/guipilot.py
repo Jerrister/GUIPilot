@@ -51,14 +51,10 @@ class GUIPilot(ScreenChecker):
         def check_color_consistency(wi1: np.ndarray, wi2: np.ndarray) -> bool:
             """Check if the color distribution on both widgets are similar"""
             # normalized 3D color histogram, 8 bins per channel
-            hist1 = cv2.calcHist(
-                [wi1], [0, 1, 2], None, [8, 8, 8], [0, 250, 0, 250, 0, 250]
-            )
+            hist1 = cv2.calcHist([wi1], [0, 1, 2], None, [8, 8, 8], [0, 250, 0, 250, 0, 250])
             hist1 = cv2.normalize(hist1, hist1).flatten()
 
-            hist2 = cv2.calcHist(
-                [wi2], [0, 1, 2], None, [8, 8, 8], [0, 250, 0, 250, 0, 250]
-            )
+            hist2 = cv2.calcHist([wi2], [0, 1, 2], None, [8, 8, 8], [0, 250, 0, 250, 0, 250])
             hist2 = cv2.normalize(hist2, hist2).flatten()
 
             score = cv2.compareHist(hist1, hist2, cv2.HISTCMP_KL_DIV)

@@ -39,22 +39,17 @@ class Record(BaseModel):
             raise ValueError("Initial activity must match activity in the first step")
 
         for i, step in enumerate(self.steps):
-            if step.screenshot != f"{i+1}.jpg":
+            if step.screenshot != f"{i + 1}.jpg":
                 raise ValueError("Screenshot filenames must be a sequential number JPG")
 
-            if step.layout != f"{i+1}.xml":
+            if step.layout != f"{i + 1}.xml":
                 raise ValueError("Layout filenames must be a sequential number XML")
 
             if step.action is None and i != len(self.steps) - 1:
                 raise ValueError("An empty action can only be at the last step")
 
-            if (
-                step.action is not None
-                and step.action.upper() not in Action._member_names_
-            ):
-                raise ValueError(
-                    f"Action must be one of the atomic actions, got {step.action}"
-                )
+            if step.action is not None and step.action.upper() not in Action._member_names_:
+                raise ValueError(f"Action must be one of the atomic actions, got {step.action}")
 
             if step.time is not None and step.time < 0:
                 raise ValueError("Time taken must be a non-negative float")
@@ -121,11 +116,7 @@ class Recorder(Automator):
         app_path = os.path.join(base_path, self.package_name)
         os.makedirs(app_path, exist_ok=True)
         process_no = (
-            sum(
-                os.path.isdir(os.path.join(app_path, entry))
-                for entry in os.listdir(app_path)
-            )
-            + 1
+            sum(os.path.isdir(os.path.join(app_path, entry)) for entry in os.listdir(app_path)) + 1
         )
         self.record_dir = os.path.join(app_path, f"process_{process_no}")
         os.makedirs(self.record_dir, exist_ok=False)
@@ -261,9 +252,7 @@ class Recorder(Automator):
         super().send_keys(text)
 
     @record
-    def scroll(
-        self, direction: Literal["left", "right", "up", "down"], distance: int = 2
-    ):
+    def scroll(self, direction: Literal["left", "right", "up", "down"], distance: int = 2):
         super().scroll(direction, distance)
 
     @record

@@ -19,10 +19,8 @@ def delete_widgets(screen: Screen, p: float) -> tuple[Screen, set]:
         color = get_context_color(widget_image)
         screen.image[ymin:ymax, xmin:xmax] = color
 
-    screen.widgets = {
-        id: widget for id, widget in screen.widgets.items() if id not in remove
-    }
-    changed = set([(id, None) for id in remove])
+    screen.widgets = {id: widget for id, widget in screen.widgets.items() if id not in remove}
+    changed = {(id, None) for id in remove}
     return screen, changed
 
 
@@ -70,14 +68,8 @@ def delete_row(screen: Screen, p: float) -> tuple[Screen, set]:
             xmin_c, ymin_c, xmax_c, ymax_c = widget_c.bbox
             if ymin_c > ymax_a:
                 shifted.add(c)
-                widget_c.bbox = Bbox(
-                    xmin_c, ymin_c - y_offset, xmax_c, ymax_c - y_offset
-                )
+                widget_c.bbox = Bbox(xmin_c, ymin_c - y_offset, xmax_c, ymax_c - y_offset)
 
-    screen.widgets = {
-        id: widget for id, widget in screen.widgets.items() if id not in remove
-    }
-    changed = set(
-        [(id, None) for id in remove] + [(id, id, Inconsistency.BBOX) for id in shifted]
-    )
+    screen.widgets = {id: widget for id, widget in screen.widgets.items() if id not in remove}
+    changed = set([(id, None) for id in remove] + [(id, id, Inconsistency.BBOX) for id in shifted])
     return screen, changed

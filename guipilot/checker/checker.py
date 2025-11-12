@@ -29,8 +29,8 @@ class ScreenChecker(ABC):
 
             float: Time taken (seconds) to check all widgets
         """
-        unpaired_i = set([id for id in screen_i.widgets.keys()])
-        unpaired_j = set([id for id in screen_j.widgets.keys()])
+        unpaired_i = set(screen_i.widgets.keys())
+        unpaired_j = set(screen_j.widgets.keys())
 
         start_time = timer()
         result = set()

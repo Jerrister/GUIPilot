@@ -49,5 +49,5 @@ jobs:
         shell: bash -l {0}
         run: |
           echo "===== 开始 Pylint 检查 ====="
-          pylint guipilot/ --disable=E0401,E1101 || true
+          pylint guipilot/ experiments/ --disable=E0401,E1101 || true
           echo "===== Pylint 检查结束 ====="

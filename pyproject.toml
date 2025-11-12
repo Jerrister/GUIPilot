@@ -1,0 +1,18 @@
+# pyproject.toml（项目根目录）
+[tool.ruff.lint]
+# 启用 flake8-comprehensions 规则集（C4 前缀），用于修复 R1721
+select = [
+    "E",    # 语法错误
+    "F",    # 导入问题
+    "W",    # 警告
+    "C",    # 格式问题
+    "C4"    # 推导式优化（包含 R1721 对应的规则）
+]
+# 允许修复 C4 规则（即 R1721 这类问题）
+fixable = [
+    "E",
+    "F",
+    "W",
+    "C",
+    "C4"
+]

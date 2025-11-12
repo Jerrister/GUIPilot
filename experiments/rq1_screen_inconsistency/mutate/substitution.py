@@ -1,9 +1,7 @@
 import random
 import string
-from collections import Counter
 from copy import deepcopy
 
-import albumentations as A
 import cv2
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -64,12 +62,8 @@ def swap_widgets(screen: Screen, p: float) -> tuple[Screen, set]:
         j.bbox = bbox_a
 
         # Perform the swap with adjusted dimensions
-        screen.image[bbox_a[1] : bbox_a[3], bbox_a[0] : bbox_a[2]] = image_j[
-            : j.height, : j.width
-        ]
-        screen.image[bbox_b[1] : bbox_b[3], bbox_b[0] : bbox_b[2]] = image_i[
-            : i.height, : i.width
-        ]
+        screen.image[bbox_a[1] : bbox_a[3], bbox_a[0] : bbox_a[2]] = image_j[: j.height, : j.width]
+        screen.image[bbox_b[1] : bbox_b[3], bbox_b[0] : bbox_b[2]] = image_i[: i.height, : i.width]
 
     screen = deepcopy(screen)
     n = len(screen.widgets)
@@ -114,9 +108,9 @@ def swap_widgets(screen: Screen, p: float) -> tuple[Screen, set]:
     sorted_widget_ids = [widget_ids[i] for i in sorted_indices]
     screen.widgets = dict(zip(sorted_widget_ids, sorted_widgets))
 
-    changed = set(
-        (id1, id2, Inconsistency.BBOX) for id1, id2 in pairs if id1 != id2
-    ) | set((id2, id1, Inconsistency.BBOX) for id1, id2 in pairs if id1 != id2)
+    changed = {(id1, id2, Inconsistency.BBOX) for id1, id2 in pairs if id1 != id2} | {
+        (id2, id1, Inconsistency.BBOX) for id1, id2 in pairs if id1 != id2
+    }
     return screen, changed
 
 
@@ -148,9 +142,7 @@ def change_widgets_text(screen: Screen, p: float) -> tuple[Screen, set]:
     screen = deepcopy(screen)
     text_based_widgets = {WidgetType.TEXT_VIEW, WidgetType.TEXT_BUTTON}
     widgets = {
-        id: widget
-        for id, widget in screen.widgets.items()
-        if widget.type in text_based_widgets
+        id: widget for id, widget in screen.widgets.items() if widget.type in text_based_widgets
     }
     widgets: dict[int, Widget] = sample_p(widgets, p)
     changed = set()
@@ -171,9 +163,7 @@ def change_widgets_text(screen: Screen, p: float) -> tuple[Screen, set]:
 
             font, thickness = cv2.FONT_HERSHEY_SIMPLEX, 2
             text_image = screen.image[ymin:ymax, xmin:xmax]
-            font_scale = get_max_font_scale(
-                text, (xmin, ymin, xmax, ymax), font, thickness
-            )
+            font_scale = get_max_font_scale(text, (xmin, ymin, xmax, ymax), font, thickness)
 
             # Fill bbox with widget context color and insert text
             bg_color = get_context_color(text_image)
@@ -216,9 +206,7 @@ def change_widgets_color(screen: Screen, p: float) -> tuple[Screen, set]:
         colored_image = np.full(image.shape, random_color, dtype=np.uint8)
 
         # Use the mask to change the color of non-whitespace areas
-        result_image = cv2.bitwise_and(
-            colored_image, colored_image, mask=non_whitespace_mask
-        )
+        result_image = cv2.bitwise_and(colored_image, colored_image, mask=non_whitespace_mask)
         masked_whitespace = cv2.bitwise_and(filtered_image, filtered_image, mask=mask)
         result_image = cv2.add(result_image, masked_whitespace)
         return result_image
@@ -231,9 +219,7 @@ def change_widgets_color(screen: Screen, p: float) -> tuple[Screen, set]:
         WidgetType.CHART,
     }
     widgets = {
-        id: widget
-        for id, widget in screen.widgets.items()
-        if widget.type in image_based_widgets
+        id: widget for id, widget in screen.widgets.items() if widget.type in image_based_widgets
     }
     widgets = sample_p(widgets, p)
     changed = set()

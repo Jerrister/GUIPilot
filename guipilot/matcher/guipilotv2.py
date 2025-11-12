@@ -21,13 +21,9 @@ class GUIPilotV2(WidgetMatcher):
         self.s1, self.s2 = s1, s2
         super().__init__()
 
-    def match(
-        self, screen_i: Screen, screen_j: Screen
-    ) -> tuple[list[Pair], list[Score], float]:
+    def match(self, screen_i: Screen, screen_j: Screen) -> tuple[list[Pair], list[Score], float]:
         start_time = timer()
-        widget_keys_i, widget_keys_j = list(screen_i.widgets.keys()), list(
-            screen_j.widgets.keys()
-        )
+        widget_keys_i, widget_keys_j = list(screen_i.widgets.keys()), list(screen_j.widgets.keys())
         scores = self._calculate_match_scores(screen_i, screen_j)
         path = self._find_longest_matching_subsequence(scores)
         pairs = [(widget_keys_i[x], widget_keys_j[y]) for x, y in path]
@@ -81,9 +77,7 @@ class GUIPilotV2(WidgetMatcher):
 
         for i, widget_i in enumerate(widgets_i):
             for j, widget_j in enumerate(widgets_j):
-                distance_score = get_distance_score(
-                    screen_i, screen_j, widget_i, widget_j
-                )
+                distance_score = get_distance_score(screen_i, screen_j, widget_i, widget_j)
                 area_score = get_area_score(widget_i, widget_j)
                 shape_score = get_shape_score(widget_i, widget_j)
                 type_score = get_type_score(widget_i, widget_j)
@@ -100,9 +94,7 @@ class GUIPilotV2(WidgetMatcher):
         dp = np.zeros((m + 1, n + 1))
         for i in range(1, m + 1):
             for j in range(1, n + 1):
-                dp[i, j] = max(
-                    dp[i - 1, j], dp[i, j - 1], dp[i - 1, j - 1] + D[i - 1, j - 1]
-                )
+                dp[i, j] = max(dp[i - 1, j], dp[i, j - 1], dp[i - 1, j - 1] + D[i - 1, j - 1])
         i, j = m, n
         sequence = []
         while i > 0 and j > 0:

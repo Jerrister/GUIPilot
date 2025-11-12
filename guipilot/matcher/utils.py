@@ -10,7 +10,6 @@ def visualize_match_scores(
     widget_keys_i: list[int],
     widget_keys_j: list[int],
 ) -> tuple[Figure, Axes]:
-
     fig, ax = plt.subplots(figsize=(12, 10))
 
     # Display the grid
@@ -26,9 +25,9 @@ def visualize_match_scores(
         ax.text(j, i, f"{val}", ha="center", va="center", color="white", fontsize=8)
 
     # Set x and y ticks using widget keys
-    ax.set_xticks(np.arange(scores.shape[1]), [x for x in widget_keys_j])
+    ax.set_xticks(np.arange(scores.shape[1]), list(widget_keys_j))
     ax.set_xticklabels(widget_keys_j)
-    ax.set_yticks(np.arange(scores.shape[0]), [y for y in widget_keys_i])
+    ax.set_yticks(np.arange(scores.shape[0]), list(widget_keys_i))
     ax.set_yticklabels(widget_keys_i)
 
     # Add color bar, labels, and title

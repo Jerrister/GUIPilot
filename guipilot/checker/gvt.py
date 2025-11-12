@@ -32,9 +32,7 @@ class GVT(ScreenChecker):
             colors_list: list[int] = [palette[i : i + 3] for i in range(0, k * 3, 3)]
             return [[255, 255, 255] if not color else color for color in colors_list]
 
-        def get_color_distance(
-            color1: tuple[int, int, int], color2: tuple[int, int, int]
-        ) -> float:
+        def get_color_distance(color1: tuple[int, int, int], color2: tuple[int, int, int]) -> float:
             """Calculates redmean color distance, weight adjusted for human perception"""
             r1, g1, b1 = color1
             r2, g2, b2 = color2
@@ -42,9 +40,7 @@ class GVT(ScreenChecker):
             mean_r = (r1 + r2) / 2
             delta_r, delta_g, delta_b = r1 - r2, g1 - g2, b1 - b2
             weight_r, weight_g, weight_b = 2 + mean_r / 256, 4, 2 + (255 - mean_r) / 256
-            dist = math.sqrt(
-                weight_r * delta_r**2 + weight_g * delta_g**2 + weight_b * delta_b**2
-            )
+            dist = math.sqrt(weight_r * delta_r**2 + weight_g * delta_g**2 + weight_b * delta_b**2)
             return dist / max_dist
 
         def check_bbox_consistency(w1: Widget, w2: Widget) -> bool:
@@ -62,10 +58,8 @@ class GVT(ScreenChecker):
             colors1 = get_quantized_colors(wi1, 3)
             colors2 = get_quantized_colors(wi2, 3)
             return all(
-                [
-                    get_color_distance(color1, color2) <= 0.01
+                get_color_distance(color1, color2) <= 0.01
                     for color1, color2 in zip(colors1, colors2)
-                ]
             )
 
         def check_pid_consistency(wi1: np.ndarray, wi2: np.ndarray) -> bool:
@@ -78,9 +72,7 @@ class GVT(ScreenChecker):
             wi2 = cv2.cvtColor(wi2, cv2.COLOR_BGR2GRAY)
             wi2 = cv2.resize(wi2, (w3, h3), interpolation=cv2.INTER_AREA)
             absdiff = cv2.absdiff(wi1, wi2)
-            _, thresholded = cv2.threshold(
-                absdiff, int(0.1 * 255), 255, cv2.THRESH_BINARY
-            )
+            _, thresholded = cv2.threshold(absdiff, int(0.1 * 255), 255, cv2.THRESH_BINARY)
             diff_ratio = np.count_nonzero(thresholded) / (h3 * w3)
             return diff_ratio <= 0.2
 

@@ -45,10 +45,10 @@ class Process(object):
         pairs, scores = matcher.match(screen, target)
         inconsistencies, _ = checker.check(screen, target, pairs)
 
-        unpaired_screen = set([x[0] for x in inconsistencies if x[1] is None])
+        unpaired_screen = {x[0] for x in inconsistencies if x[1] is None}
         unpaired_screen = len(unpaired_screen) / len(screen.widgets)
 
-        unpaired_target = set([x[1] for x in inconsistencies if x[0] is None])
+        unpaired_target = {x[1] for x in inconsistencies if x[0] is None}
         unpaired_target = len(unpaired_target) / len(target.widgets)
 
         matching_score = sum(scores) / len(target.widgets)
