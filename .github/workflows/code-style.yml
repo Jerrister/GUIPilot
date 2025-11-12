@@ -20,6 +20,20 @@ jobs:
           activate-environment: guipilot
           miniconda-version: "latest"
 
+      - name: 缓存 Conda 环境（减少依赖安装时间）
+        uses: actions/cache@v3
+        with:
+          # 缓存 Conda 环境和包缓存目录
+          path: |
+            ~/miniconda3/envs/guipilot
+            ~/miniconda3/pkgs
+            ~/.cache/pip  # 缓存 pip 安装的工具
+          # 缓存键：系统 + Conda 环境文件哈希（环境文件不变则复用缓存）
+          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
+          # 回退键：匹配相同系统的旧缓存（加速首次缓存命中）
+          restore-keys: |
+            ${{ runner.os }}-conda-
+              
       - name: 安装代码检查工具
         shell: bash -l {0}
         run: |
