@@ -28,15 +28,15 @@ class Widget:
     @property
     def width(self) -> float:
         return self.bbox.xmax - self.bbox.xmin
-    
+
     @property
     def height(self) -> float:
         return self.bbox.ymax - self.bbox.ymin
-    
+
     @property
     def area(self) -> float:
         return self.width * self.height
-    
+
     @property
     def center(self) -> tuple[float, float]:
         cx = (self.bbox.xmin + self.bbox.xmax) / 2

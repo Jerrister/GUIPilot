@@ -23,22 +23,20 @@ detector = Detector(service_url="http://localhost:6000/detect")
 class Screen:
     image: np.ndarray
     widgets: dict[int, Widget] = field(default_factory=dict)
-    
+
     def detect(self) -> None:
         """
         Use object detector to extract widgets from screen
         Updates widgets list to the detection results
         """
+
         def _to_bbox(points: np.ndarray) -> Bbox:
             xmin, ymin, xmax, ymax = points
             return Bbox(int(xmin), int(ymin), int(xmax), int(ymax))
-        
+
         bboxes, widget_types = detector(self.image)
         self.widgets = {
-            i: Widget(
-                type=WidgetType(widget_type),
-                bbox=_to_bbox(bbox)
-            )
+            i: Widget(type=WidgetType(widget_type), bbox=_to_bbox(bbox))
             for i, (bbox, widget_type) in enumerate(zip(bboxes, widget_types))
         }
 
@@ -61,7 +59,9 @@ class Screen:
                 print(self.image.shape)
                 print(widget.bbox)
 
-    def check(self, target: Screen, matcher: WidgetMatcher, checker: ScreenChecker) -> tuple[set, float]:
+    def check(
+        self, target: Screen, matcher: WidgetMatcher, checker: ScreenChecker
+    ) -> tuple[set, float]:
         """Check for screen inconsistency
 
         Args:
