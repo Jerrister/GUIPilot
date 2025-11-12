@@ -31,7 +31,7 @@ jobs:
         shell: bash -l {0}
         run: |
           echo "===== 开始 Black 检查 ====="
-          black --check guipilot/ experiments/ || true
+          black --check guipilot/ experiments/
           echo "===== Black 检查结束 ====="
           echo ""
 
@@ -40,7 +40,7 @@ jobs:
         shell: bash -l {0}
         run: |
           echo "===== 开始 Flake8 检查 ====="
-          flake8 guipilot/ experiments/ --select=E9,F63,F7,F82 --statistics || true
+          flake8 guipilot/ experiments/ --select=E9,F63,F7,F82 --statistics
           echo "===== Flake8 检查结束 ====="
           echo ""
 
@@ -49,5 +49,5 @@ jobs:
         shell: bash -l {0}
         run: |
           echo "===== 开始 Pylint 检查 ====="
-          pylint guipilot/ experiments/ --disable=E0401,E1101 || true
+          pylint guipilot/ experiments/ --disable=E0401,E1101
           echo "===== Pylint 检查结束 ====="
