@@ -9,11 +9,10 @@ from typing import Iterable
 import cv2
 import jsbeautifier
 import numpy as np
-import supervision as sv
 from actions import Translator
 from PIL import Image
-from supervision import Detections
 
+from experiments.common.utils import _get_one_image, visualize_inconsistencies
 from guipilot.agent import Agent
 from guipilot.entities import Screen
 from guipilot.matcher import WidgetMatcher
@@ -156,138 +155,53 @@ def get_report(
 def visualize(
     s1: Screen, s2: Screen, pairs: list[tuple], inconsistencies: list[tuple]
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    def _get_one_image(img_list: list[np.ndarray]):
-        max_height = 0
-        total_width = 0  # padding
-        for img in img_list:
-            if img.shape[0] > max_height:
-                max_height = img.shape[0]
-            total_width += img.shape[1]
+    """
+    Visualize widget matching pairs and inconsistencies between two screens (RQ4 version with connection annotations).
 
-        # create a new array with a size large enough to contain all the images
-        final_image = np.zeros((max_height, total_width, 3), dtype=np.uint8)
+    Args:
+        s1, s2: Two screens to compare
+        pairs: List of matched widget ID pairs (e.g., [(id1, id2), ...])
+        inconsistencies: List of inconsistent widget pairs with types
 
-        current_x = 0  # keep track of where your current image was last placed in the y coordinate
-        for image in img_list:
-            # add an image to the final array and increment the y coordinate
-            image = np.vstack(
-                (image, np.zeros((max_height - image.shape[0], image.shape[1], 3)))
-            )
-            final_image[:, current_x : current_x + image.shape[1], :] = image
-            current_x += image.shape[1]
-        return final_image
+    Returns:
+        3-tuple of images:
+        - Original concatenated image (without annotations)
+        - Concatenated image with bounding box annotations
+        - Annotated concatenated image with matching connection lines
+    """
+    # 1. Generate original concatenated image (without annotations)
+    original_image = _get_one_image([s1.image, s2.image])
 
-    annotators = [
-        sv.BoxAnnotator(
-            color=sv.Color.GREEN, thickness=2, color_lookup=sv.ColorLookup.INDEX
-        ),
-        sv.BoxAnnotator(
-            color=sv.Color.YELLOW, thickness=2, color_lookup=sv.ColorLookup.INDEX
-        ),
-        sv.BoxAnnotator(
-            color=sv.Color.RED, thickness=2, color_lookup=sv.ColorLookup.INDEX
-        ),
-    ]
-    label_annotator = sv.LabelAnnotator(
-        color=sv.Color.BLACK,
-        text_color=sv.Color.WHITE,
-        color_lookup=sv.ColorLookup.INDEX,
-        text_position=sv.Position.TOP_LEFT,
-        text_padding=1,
-    )
+    # 2. Call common function to generate bounding box annotated image (return image only, no saving)
+    bbox_image = visualize_inconsistencies(s1, s2, pairs, inconsistencies)
 
-    s1_bboxes = {"paired": {}, "paired_inconsistent": {}, "unpaired": {}}
-    s2_bboxes = {"paired": {}, "paired_inconsistent": {}, "unpaired": {}}
-
-    paired_inconsistent = set()
-    for inconsistency in inconsistencies:
-        id1, id2 = inconsistency[:2]
-        if id1 is not None:
-            xmin1, ymin1, xmax1, ymax1 = s1.widgets[id1].bbox
-        if id2 is not None:
-            xmin2, ymin2, xmax2, ymax2 = s2.widgets[id2].bbox
-        if id1 is not None and id2 is not None:
-            s1_bboxes["paired_inconsistent"][id1] = [
-                int(xmin1),
-                int(ymin1),
-                int(xmax1),
-                int(ymax1),
-            ]
-            s2_bboxes["paired_inconsistent"][id2] = [
-                int(xmin2),
-                int(ymin2),
-                int(xmax2),
-                int(ymax2),
-            ]
-            paired_inconsistent.add((id1, id2))
-        elif id1 is not None:
-            s1_bboxes["unpaired"][id1] = [
-                int(xmin1),
-                int(ymin1),
-                int(xmax1),
-                int(ymax1),
-            ]
-        elif id2 is not None:
-            s2_bboxes["unpaired"][id2] = [
-                int(xmin2),
-                int(ymin2),
-                int(xmax2),
-                int(ymax2),
-            ]
-
-    for pair in pairs:
-        if pair in paired_inconsistent:
-            continue
-        id1, id2 = pair
-        xmin1, ymin1, xmax1, ymax1 = s1.widgets[id1].bbox
-        xmin2, ymin2, xmax2, ymax2 = s2.widgets[id2].bbox
-        s1_bboxes["paired"][id1] = [int(xmin1), int(ymin1), int(xmax1), int(ymax1)]
-        s2_bboxes["paired"][id2] = [int(xmin2), int(ymin2), int(xmax2), int(ymax2)]
-
-    s1_image = copy.deepcopy(s1.image)
-    for (_, bboxes), annotator in zip(s1_bboxes.items(), annotators):
-        if len(bboxes) == 0:
-            continue
-        detections = Detections(np.array(list(bboxes.values())))
-        annotator.annotate(s1_image, detections)
-        label_annotator.annotate(
-            s1_image, detections, labels=[f"{i}" for i in bboxes.keys()]
-        )
-
-    s2_image = copy.deepcopy(s2.image)
-    for (_, bboxes), annotator in zip(s2_bboxes.items(), annotators):
-        if len(bboxes) == 0:
-            continue
-        detections = Detections(np.array(list(bboxes.values())))
-        annotator.annotate(s2_image, detections)
-        label_annotator.annotate(
-            s2_image, detections, labels=[f"{i}" for i in bboxes.keys()]
-        )
-
-    image = _get_one_image([s1.image, s2.image])
-    bbox_image = _get_one_image([s1_image, s2_image])
-
+    # 3. Add RQ4-specific logic: draw connection lines between matched pairs on the annotated image
     match_image = copy.deepcopy(bbox_image)
-    _, x_shift, _ = s1_image.shape
+    # Get the width of the first screen image (to calculate x-offset for the second screen)
+    _, x_shift, _ = s1.image.shape
+
     for pair in pairs:
         id1, id2 = pair
         if id1 is not None and id2 is not None:
+            # Calculate center points of the two matched widgets
             xmin1, ymin1, xmax1, ymax1 = s1.widgets[id1].bbox
             xmin2, ymin2, xmax2, ymax2 = s2.widgets[id2].bbox
             xc1 = (xmin1 + xmax1) // 2
             yc1 = (ymin1 + ymax1) // 2
             xc2 = (xmin2 + xmax2) // 2
             yc2 = (ymin2 + ymax2) // 2
+
+            # Draw connection line (x-coordinate of the second screen needs x-offset)
             cv2.line(
                 match_image,
                 (xc1, yc1),
                 (x_shift + xc2, yc2),
-                (255, 0, 0),
+                color=(255, 0, 0),  # Blue line
                 thickness=2,
                 lineType=cv2.LINE_4,
             )
 
-    return image, bbox_image, match_image
+    return original_image, bbox_image, match_image
 
 
 def annotate_screen(screen: Screen) -> Image.Image:

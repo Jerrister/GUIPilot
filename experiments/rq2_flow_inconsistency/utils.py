@@ -7,11 +7,10 @@ from typing import Callable, Iterable
 
 import cv2
 import numpy as np
-import supervision as sv
 from actions import Automator, Step, Translator
 from PIL import Image
-from supervision import Detections
 
+from experiments.common.utils import visualize_inconsistencies
 from guipilot.agent import Agent
 from guipilot.checker import ScreenChecker
 from guipilot.entities import Screen
@@ -186,121 +185,6 @@ def annotate_screen(screen: Screen) -> Image.Image:
         )
 
     image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    return image
-
-
-def visualize_inconsistencies(
-    s1: Screen, s2: Screen, pairs: list[tuple], inconsistencies: list[tuple]
-) -> np.ndarray:
-    def _get_one_image(img_list: list[np.ndarray]):
-        max_height = 0
-        total_width = 0  # padding
-        for img in img_list:
-            if img.shape[0] > max_height:
-                max_height = img.shape[0]
-            total_width += img.shape[1]
-
-        # create a new array with a size large enough to contain all the images
-        final_image = np.zeros((max_height, total_width, 3), dtype=np.uint8)
-
-        current_x = 0  # keep track of where your current image was last placed in the y coordinate
-        for image in img_list:
-            # add an image to the final array and increment the y coordinate
-            image = np.vstack(
-                (image, np.zeros((max_height - image.shape[0], image.shape[1], 3)))
-            )
-            final_image[:, current_x : current_x + image.shape[1], :] = image
-            current_x += image.shape[1]
-        return final_image
-
-    annotators = [
-        sv.BoxAnnotator(
-            color=sv.Color.GREEN, thickness=2, color_lookup=sv.ColorLookup.INDEX
-        ),
-        sv.BoxAnnotator(
-            color=sv.Color.YELLOW, thickness=2, color_lookup=sv.ColorLookup.INDEX
-        ),
-        sv.BoxAnnotator(
-            color=sv.Color.RED, thickness=2, color_lookup=sv.ColorLookup.INDEX
-        ),
-    ]
-    label_annotator = sv.LabelAnnotator(
-        color=sv.Color.BLACK,
-        text_color=sv.Color.WHITE,
-        color_lookup=sv.ColorLookup.INDEX,
-        text_position=sv.Position.TOP_LEFT,
-        text_padding=1,
-    )
-
-    s1_bboxes = {"paired": {}, "paired_inconsistent": {}, "unpaired": {}}
-    s2_bboxes = {"paired": {}, "paired_inconsistent": {}, "unpaired": {}}
-
-    paired_inconsistent = set()
-    for inconsistency in inconsistencies:
-        id1, id2 = inconsistency[:2]
-        if id1 is not None:
-            xmin1, ymin1, xmax1, ymax1 = s1.widgets[id1].bbox
-        if id2 is not None:
-            xmin2, ymin2, xmax2, ymax2 = s2.widgets[id2].bbox
-        if id1 is not None and id2 is not None:
-            s1_bboxes["paired_inconsistent"][id1] = [
-                int(xmin1),
-                int(ymin1),
-                int(xmax1),
-                int(ymax1),
-            ]
-            s2_bboxes["paired_inconsistent"][id2] = [
-                int(xmin2),
-                int(ymin2),
-                int(xmax2),
-                int(ymax2),
-            ]
-            paired_inconsistent.add((id1, id2))
-        elif id1 is not None:
-            s1_bboxes["unpaired"][id1] = [
-                int(xmin1),
-                int(ymin1),
-                int(xmax1),
-                int(ymax1),
-            ]
-        elif id2 is not None:
-            s2_bboxes["unpaired"][id2] = [
-                int(xmin2),
-                int(ymin2),
-                int(xmax2),
-                int(ymax2),
-            ]
-
-    for pair in pairs:
-        if pair in paired_inconsistent:
-            continue
-        id1, id2 = pair
-        xmin1, ymin1, xmax1, ymax1 = s1.widgets[id1].bbox
-        xmin2, ymin2, xmax2, ymax2 = s2.widgets[id2].bbox
-        s1_bboxes["paired"][id1] = [int(xmin1), int(ymin1), int(xmax1), int(ymax1)]
-        s2_bboxes["paired"][id2] = [int(xmin2), int(ymin2), int(xmax2), int(ymax2)]
-
-    s1_image = s1.image
-    for (name, bboxes), annotator in zip(s1_bboxes.items(), annotators):
-        if len(bboxes) == 0:
-            continue
-        detections = Detections(np.array(list(bboxes.values())))
-        annotator.annotate(s1_image, detections)
-        label_annotator.annotate(
-            s1_image, detections, labels=[f"{i}" for i in bboxes.keys()]
-        )
-
-    s2_image = s2.image
-    for (name, bboxes), annotator in zip(s2_bboxes.items(), annotators):
-        if len(bboxes) == 0:
-            continue
-        detections = Detections(np.array(list(bboxes.values())))
-        annotator.annotate(s2_image, detections)
-        label_annotator.annotate(
-            s2_image, detections, labels=[f"{i}" for i in bboxes.keys()]
-        )
-
-    image = _get_one_image([s1_image, s2_image])
     return image
 
 

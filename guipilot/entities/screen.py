@@ -15,9 +15,6 @@ if typing.TYPE_CHECKING:
     from guipilot.checker import ScreenChecker
     from guipilot.matcher import WidgetMatcher
 
-    from .screen import Screen
-
-
 ocr = OCR(service_url="http://localhost:5000/detect")
 detector = Detector(service_url="http://localhost:6000/detect")
 

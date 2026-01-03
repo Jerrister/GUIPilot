@@ -145,8 +145,12 @@ if __name__ == "__main__":
                         _path = image_path.split("/")[-2]
                         _path = f"{matcher_name}_{checker_name}/{mutation_name}/{_path}"
                         _filename = image_path.split("/")[-1].replace(".jpg", "")
+                        # visualize_inconsistencies(
+                        #     screen1, screen2, pairs, y_pred, _path, _filename
+                        # )
+                        save_path = f"./visualize/{_path}/{_filename}.jpg"
                         visualize_inconsistencies(
-                            screen1, screen2, pairs, y_pred, _path, _filename
+                            screen1, screen2, pairs, y_pred, save_path=save_path
                         )
                         with open(f"./visualize/{_path}/{_filename}.txt", "w") as f:
                             f.writelines(

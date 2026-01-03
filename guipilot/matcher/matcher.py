@@ -4,7 +4,6 @@ import typing
 from abc import ABC, abstractmethod
 from typing import TypeAlias
 
-
 if typing.TYPE_CHECKING:
     from guipilot.entities import Screen, Widget
 

@@ -23,8 +23,8 @@ class Process(object):
         target: Screen,
         matcher: WidgetMatcher,
         checker: ScreenChecker,
-        process_path,
-        i,
+        # process_path,
+        # i,
     ) -> tuple[bool, float]:
         """Check for process inconsistency on the current screen
 
