@@ -1,12 +1,12 @@
 name: Security Check
 
 on:
-  # 触发时机: 和代码风格检查保持一致，也可单独配置
+  # Trigger timing: consistent with code style check, or configurable independently
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  # 可选: 每周一自动执行一次全量安全检查 (定期扫描依赖漏洞) 
+  # Optional: Run full security check automatically every Monday (scan dependency vulnerabilities regularly)
   schedule:
     - cron: '0 0 * * 1'
 
@@ -14,10 +14,10 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
-      - name: 拉取代码
+      - name: Check out code
         uses: actions/checkout@v4
 
-      - name: 缓存 Conda 环境 (复用代码风格检查的缓存逻辑) 
+      - name: Cache Conda environment (reuse cache logic from code style check)
         uses: actions/cache@v3
         with:
           path: |
@@ -28,27 +28,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-conda-
 
-      - name: 配置 Miniconda
+      - name: Configure Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
           activate-environment: guipilot
           miniconda-version: "latest"
 
-      - name: 安装安全检查工具
+      - name: Install security scanning tools
         shell: bash -l {0}
         run: |
           python -m pip install --upgrade pip
-          # 1. bandit: 检查代码中的安全漏洞 (如 SQL 注入、硬编码密钥等) 
-          # 2. safety: 检查依赖中的已知安全漏洞
+          # 1. bandit: Scan for security vulnerabilities in code (e.g., SQL injection, hardcoded secrets, etc.)
+          # 2. safety: Check for known security vulnerabilities in dependencies
           pip install bandit
 
-      # 步骤1: bandit 代码安全漏洞检查
-      - name: Bandit - 代码安全漏洞扫描
+      # Step 1: Bandit - Code security vulnerability scanning
+      - name: Bandit - Code security vulnerability scan
         shell: bash -l {0}
         run: |
-          echo "===== 开始 Bandit 代码安全检查 ====="
-          # -r: 递归扫描目录
+          echo "===== Start Bandit code security check ====="
+          # -r: Recursively scan directories
           bandit . --tests B105,B108,B603
-          echo "===== Bandit 检查结束 ====="
+          echo "===== Bandit check completed ====="
           echo ""
