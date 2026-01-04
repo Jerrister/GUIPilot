@@ -9,14 +9,16 @@ import numpy as np
 if typing.TYPE_CHECKING:
     from guipilot.entities import Screen, Widget
 
-import re
-from difflib import SequenceMatcher
 import math
+import re
+from abc import ABC, abstractmethod
+from difflib import SequenceMatcher
+
 import cv2
 import numpy as np
 from PIL import Image
-from abc import ABC, abstractmethod
-from guipilot.entities import Widget, Inconsistency, WidgetType
+
+from guipilot.entities import Inconsistency, Widget, WidgetType
 
 
 class ScreenChecker(ABC):
@@ -82,7 +84,21 @@ class ScreenChecker(ABC):
         pass
 
     def check_text_consistency(self, w1: Widget, w2: Widget) -> bool:
-        """Check if the text on both widgets are similar"""
+        """
+        Compares the similarity of text content between two widgets.
+
+        Only widgets with text-related types (e.g., TEXT_VIEW, INPUT_BOX) are
+        evaluated. The algorithm normalizes strings by removing non-alphanumeric
+        characters and performs a case-insensitive comparison using SequenceMatcher.
+
+        Args:
+            w1 (Widget): First widget containing text strings.
+            w2 (Widget): Second widget containing text strings.
+
+        Returns:
+            bool: True if text similarity meets the 0.95 threshold or if
+                widgets are non-textual.
+        """
         has_text = {
             WidgetType.TEXT_VIEW,
             WidgetType.TEXT_BUTTON,
@@ -101,7 +117,20 @@ class ScreenChecker(ABC):
         return True
 
     def check_bbox_consistency(self, w1: Widget, w2: Widget) -> bool:
-        """Check if both widgets have similar position, size, and shape on the screen"""
+        """
+        Validates if two widgets have similar spatial placement and dimensions.
+
+        Uses the Intersection over Union (IoU) metric to evaluate the overlap
+        between two bounding boxes. A high IoU indicates consistent positioning
+        and sizing on the screen.
+
+        Args:
+            w1 (Widget): First widget for comparison.
+            w2 (Widget): Second widget for comparison.
+
+        Returns:
+            bool: True if the IoU is greater than 0.9, False otherwise.
+        """
         xa, ya = max(w1.bbox[0], w2.bbox[0]), max(w1.bbox[1], w2.bbox[1])
         xb, yb = min(w1.bbox[2], w2.bbox[2]), min(w1.bbox[3], w2.bbox[3])
         intersection = abs(max((xb - xa, 0)) * max((yb - ya), 0))
